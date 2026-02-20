@@ -214,7 +214,7 @@
                         </div>
 
                         <div class="mt-3">
-                            <x-primary-button @click="showConfirmModal = true">
+                            <x-primary-button @click="savePair()">
                                 Save Favourite
                             </x-primary-button>
                         </div>
@@ -294,6 +294,7 @@
             const latest = @json($latestPair);
             return {
                 fonts: @json($fonts),
+                savedPairNames: @json($savedPairs->pluck('name')->values()),
                 userHasEditedName: latest ? true : false,
                 showConfirmModal: false,
 
@@ -367,6 +368,22 @@
                     this.bodyParagraphWidth = (Math.random() * 100 + 20).toFixed(0);
 
                     this.bodyBaseSize = Math.floor(Math.random() * 35) + 1;
+
+                    // Reset name so it auto-generates from the new fonts
+                    this.userHasEditedName = false;
+                    this.updateDefaultName();
+                },
+
+                savePair() {
+                    const nameExists = this.savedPairNames.some(
+                        n => n.toLowerCase() === (this.projectName || '').toLowerCase()
+                    );
+
+                    if (nameExists) {
+                        this.showConfirmModal = true;
+                    } else {
+                        this.$refs.mainForm.submit();
+                    }
                 },
 
                 exportImage() {
