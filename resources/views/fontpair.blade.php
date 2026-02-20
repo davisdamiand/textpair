@@ -7,9 +7,11 @@
     <title>FontPair</title>
 
     @php
-        // Server-side initial font loading
-        $fontNames = collect($fonts)->pluck('name')->map(fn($f) => str_replace(' ', '+', $f))->implode('&family=');
-        $googleFontsUrl = "https://fonts.googleapis.com/css2?family={$fontNames}&display=swap";
+        // Only load the initial active fonts server-side to prevent URL length limits (especially since we now have 1000+ fonts in the array)
+        $initialHeading = $latestPair->heading->name ?? 'Aboreto';
+        $initialBody = $latestPair->body->name ?? 'Mukta Vaani';
+        $fontsToLoad = collect([$initialHeading, $initialBody])->unique()->map(fn($f) => str_replace(' ', '+', $f))->implode('&family=');
+        $googleFontsUrl = "https://fonts.googleapis.com/css2?family={$fontsToLoad}&display=swap";
     @endphp
 
     <link href="{{ $googleFontsUrl }}" rel="stylesheet" crossorigin="anonymous">

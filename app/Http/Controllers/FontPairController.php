@@ -15,18 +15,17 @@ class FontPairController extends Controller
     public function index()
     {
         // Cache the fonts for 24 hours (86,400 seconds)
-        $fonts = Cache::remember('google_fonts_top_20', 86400, function () {
+        $fonts = Cache::remember('google_fonts_all_experiment', 86400, function () {
 
             // 1. Hit the Google Fonts API (Sorted by popularity)
-            $apiKey = env('GOOGLE_FONTS_API_KEY'); // We'll add this to your .env file
+            $apiKey = env('GOOGLE_FONTS_API_KEY'); // Saved in .env file
             $response = Http::get("https://www.googleapis.com/webfonts/v1/webfonts?key={$apiKey}&sort=popularity");
 
             // 2. If the API request is successful
             if ($response->successful()) {
 
-                // Use Laravel Collections to grab the first 20, format them, and sort alphabetically
+                // Use Laravel Collections to format and sort all fonts alphabetically
                 return collect($response->json('items'))
-                    ->take(20) // Limit to the top 20 most popular!
                     ->map(function ($font) {
                         return [
                             'name' => $font['family'],
@@ -85,9 +84,6 @@ class FontPairController extends Controller
         if (!$sameFontAllowed && $validated['headingFont'] === $validated['bodyFont']) {
             return back()->with('error', 'Heading and Body fonts cannot be the same');
         }
-
-
-
 
         //dd($validated);
 
